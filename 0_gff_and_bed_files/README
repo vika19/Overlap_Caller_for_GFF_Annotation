@@ -1,0 +1,6 @@
+Convert gff to bed using bedtools (while removing comments and keeping only gene level entries):
+gff2bed < <(grep -v "#" PacBio_consensus_okokaltdrop.gff | grep "gene" ) > PacBio_consensus_okokaltdrop.bed
+
+OPTIONAL: To remove unnaturally large overlaps, bed files can be prefiltered to remove contigs larger than 10k.  It is recommended that this is done in CONJUNCTION with the above, not instead (there are large loci that would be missed if done in isolation):
+Prep the filtered bed files:
+awk '{dif=$2-$2; if (dif < 10000) print $0}' EST_assembled.bed > EST_assembled.filtered.bed

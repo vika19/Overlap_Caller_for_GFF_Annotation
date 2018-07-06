@@ -1,0 +1,6 @@
+This follows the creation of bedops merge files.  The merge files give a region, but do not annotate what falls in that region or if there are overlapping antiparallel loci within.  This step creates an array of included transcripts for each strand and outputs it to a final file.
+
+#build RunFiles for all subsets in step 2
+for f in ../2_bedops_split/*.out; do t=${f#../2_bedops_split/}; t=${t%.out}; cat RunCoffeeAnnot.sh > RunCoffeeAnnot.$t.sh; echo "python ../annotator.py $f ${f%out}gff $t.annot > $t.log" >> RunCoffeeAnnot.$t.sh; done
+
+NOTE: KM had special requests for exonerate input - annotator_exonerate.py handles this.  It reads and outputs annotation information and score for closest hit to the output.  This is then put to be put in the NOTES heading in gff (step 5 - under dev).

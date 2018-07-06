@@ -1,0 +1,13 @@
+This step is to make the following step more efficient.  We split the bedops overlap ranges into chromosomes (1 file each) and scaffolds (all together). We also split the gff files into the same ranges.  Then in the next step, when annotating, we can run smaller jobs (as this is a O(N) scaling issue - we want to reduce the search set as much as possible).  If this is done, a final merging step is needed. 
+
+#add all the chromosomes to one list, then split the bedout and gff
+awk '{print $1}' ../1_bedops_merge/Combined_454_Illumina.out | uniq | grep "chr" > single.list
+while IFS='' read -r line; do grep $line ../1_bedops_merge/Combined_454_Illumina.out > $line.out ; done < single.list
+while IFS='' read -r line; do grep $line ../0_gff_and_bed_files/454_EST_gffs/454_chr9.gff > $line.gff ; done < single.list
+NOTE: You shoudl combine gffs from different origins at this step with cat
+
+#add all the scaffolds and such to another, then split the bedout and gff
+awk '{print $1}' ../1_bedops_merge/Combined_454_Illumina.out | uniq | grep -v "chr" > remainder.list
+grep -f remainder ../1_bedops_merge/Combined_454_Illumina.out > remainder.out
+grep -f remainder ../)_gff_and_bed_files/454_EST_gffs/454_chr9.gff > remainder.gff
+NOTE: You shoudl combine gffs from different origins at this step with cat

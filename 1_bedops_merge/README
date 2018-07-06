@@ -1,0 +1,17 @@
+This step comes after converting gff to bed using bedtools (while removing comments and keeping only gene level entries):
+gff2bed < <(grep -v "#" PacBio_consensus_okokaltdrop.gff | grep "gene" ) > PacBio_consensus_okokaltdrop.bed
+
+The purpose of this step is to combine the bed files with all data for input into bedops merge.  Essentially, when we merge, we run the all data inclusive bed files against themselves.  This step is to create these all data inclusive bed files.
+bedops -m ../0_gff_and_bed_files/PacBio_gffs/dec_2017_version/PacBio_consensus_okokaltdrop.bed ../0_gff_and_bed_files/Illumina_gffs/Illumina.both1-4.fa.bed ../0_gff_and_bed_files/454_EST_gffs/454_all.bed ../0_gff_and_bed_files/454_EST_gffs/EST_assembled.bed > tmp
+
+OPTIONAL: To remove unnaturally large overlaps, bed files can be prefiltered to remove contigs larger than 10k.  It is recommended that this is done in CONJUNCTION with the above, not instead (there are large loci that would be missed if done in isolation):
+Prep the filtered bed files:
+awk '{dif=$3-$2; if (dif < 10000) print $0}' EST_assembled.bed > EST_assembled.filtered.bed
+
+Rerun bedops merge:
+bedops -m ../0_gff_and_bed_files/PacBio_gffs/dec_2017_version/PacBio_consensus_okokaltdrop.filtered.bed ../0_gff_and_bed_files/Illumina_gffs/Illumina.both1-4.fa.filtered.bed ../0_gff_and_bed_files/454_EST_gffs/454_all.filtered.bed ../0_gff_and_bed_files/454_EST_gffs/EST_assembled.filtered.bed > tmp
+
+This will result in more regions, as large tracks are not merged to overly large "loci:
+wc -l *.out
+57767 Combined_454_ESTassembled_Illumina1-4both_PB_consensus.filtered.out
+40449 Combined_454_ESTassembled_Illumina1-4both_PB_consensus.out

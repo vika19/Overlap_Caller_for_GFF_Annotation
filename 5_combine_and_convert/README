@@ -1,0 +1,2 @@
+Convert to gff with new names for all loci
+awk 'OFS="\t";BEGIN{n=1}{print $1,"carabica","gene",$2,$3,".",$7,".","ID=CA_Oct_2017_"n".path1\;Name=CA_Oct_2017_"n; n++}' ../4_recombine_chromosomes/Coffee.annot | grep "gene" | sed 's/)//'g > Coffee.gff

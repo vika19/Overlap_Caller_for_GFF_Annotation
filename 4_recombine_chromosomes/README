@@ -1,0 +1,9 @@
+In this step we merge the chromosome specific annot files into one file, for ease of conversion to gff in the next step.
+
+cat ../3_bedops_calculate/*.annot > Coffee.annot
+
+Pull longest contig in overlap:
+awk '{ for (i=4; i<=NF; i++) {if ($i ~ "ID") {printf "\n"$1" "$2" "$3" "$i" "} else {printf $i" "}}}' Coffee.annot | sed 's/,//g' | sort -k1,3 -k7,7rn | awk '{print $1,$2,$3,$8,$4,$5,$6,$7}' | sort -uk1,4 | awk '{print $5}' | sed -e 's/ID=//g' -e 's/.path.*//g' -e 1d > Coffee.longest_contigs.list
+
+Make gff for longest contig with annotation infomraiton in Notes section:
+awk '{ for (i=4; i<=NF; i++) {if ($i ~ "ID") {printf "\n"$1" "$2" "$3" "$i" "} else {printf $i" "}}}' Coffee.annot | sed 's/,//g' | sort -k1,3 -k7,7rn | awk '{print $1,$2,$3,$8,$4,$5,$6,$7}' | sort -uk1,4 | awk 'OFS="\t" {print $1, "carabica", "gene", $2,$3,".",$7,".",$5, ";Note="$10}' | sed 's/(.*\t//g' | sed 1d > Coffee_longest.gff
